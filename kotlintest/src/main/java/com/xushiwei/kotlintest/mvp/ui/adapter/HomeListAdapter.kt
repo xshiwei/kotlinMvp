@@ -12,6 +12,7 @@ import com.youth.banner.Banner
 import com.youth.banner.BannerConfig
 import com.youth.banner.Transformer
 import io.reactivex.Observable
+import timber.log.Timber
 
 class HomeListAdapter : BaseMultiItemQuickAdapter<HomeBean.Issue.Item, BaseViewHolder> {
 
@@ -33,9 +34,11 @@ class HomeListAdapter : BaseMultiItemQuickAdapter<HomeBean.Issue.Item, BaseViewH
                 HomeBean.Issue.Item.ONE
             }
             mData[position + bannerItemSize - 1].type == "textHeader" -> {
+                Timber.d("444444 position" + position)
                 HomeBean.Issue.Item.TWO
             }
             else -> {
+                Timber.d("555555 position" + position)
                 HomeBean.Issue.Item.THREE
             }
         }
@@ -52,6 +55,7 @@ class HomeListAdapter : BaseMultiItemQuickAdapter<HomeBean.Issue.Item, BaseViewH
     override fun convert(helper: BaseViewHolder?, item: HomeBean.Issue.Item?) {
         when (helper?.itemViewType) {
             HomeBean.Issue.Item.ONE -> {
+                Timber.d("111111")
                 val bannerItemData = mData.take(bannerItemSize).toCollection(ArrayList())
                 val bannerFeedList = ArrayList<String>()
                 val bannerTitleList = ArrayList<String>()
@@ -74,10 +78,12 @@ class HomeListAdapter : BaseMultiItemQuickAdapter<HomeBean.Issue.Item, BaseViewH
                 }
             }
             HomeBean.Issue.Item.TWO -> {
+                Timber.d("22222")
                 helper.setText(R.id.tvHeader, mData[helper.layoutPosition + bannerItemSize - 1].data?.text ?: "")
             }
             HomeBean.Issue.Item.THREE -> {
-                val itemData = item?.data
+                Timber.d("33333")
+                val itemData =  mData[helper.layoutPosition + bannerItemSize - 1]?.data
                 val defAvatar = R.mipmap.default_avatar
                 val cover = itemData?.cover?.feed
                 var avatar = itemData?.author?.icon

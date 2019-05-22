@@ -22,6 +22,7 @@ import com.xushiwei.kotlintest.mvp.presenter.HomePresenter
 import com.xushiwei.kotlintest.R
 import com.xushiwei.kotlintest.mvp.ui.adapter.HomeListAdapter
 import kotlinx.android.synthetic.main.fragment_home.*
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -67,6 +68,10 @@ class HomeFragment : BaseFragment<HomePresenter>(), HomeContract.View {
     override fun initData(savedInstanceState: Bundle?) {
         ArmsUtils.configRecyclerView(mRecyclerView, linearLayoutManager)
         mRecyclerView.adapter = mAdapter
+        mAdapter.setOnItemClickListener { adapter, view, position ->
+            val item = adapter.data[position] as HomeBean.Issue.Item
+            Timber.e("c==" + item.type)
+        }
     }
 
     /*
