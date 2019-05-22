@@ -94,11 +94,11 @@ class MainActivity : BaseActivity<MainPresenter>(), MainContract.View, BottomNav
             initialise()
         }
         bottom_navigation_bar.setTabSelectedListener(this)
-        mPresenter?.setBottomNavigationItem(bottom_navigation_bar, 8, 22, 11)
+        mPresenter?.setBottomNavigationItem(bottom_navigation_bar, 6, 20, 10)
         if (savedInstanceState != null) {
             homeFragment = supportFragmentManager.getFragment(savedInstanceState, HOME_FRAGMENT_KEY) as HomeFragment
             discoveryFragment =
-                supportFragmentManager.getFragment(savedInstanceState, DISCOVERY_FRAGMENT_KEY) as DiscoveryFragment
+                    supportFragmentManager.getFragment(savedInstanceState, DISCOVERY_FRAGMENT_KEY) as DiscoveryFragment
             hotFragment = supportFragmentManager.getFragment(savedInstanceState, HOT_FRAGMENT_KEY) as HotFragment
             mineFragment = supportFragmentManager.getFragment(savedInstanceState, MINE_FRAGMENT_KEY) as MineFragment
             addToList(homeFragment)
@@ -118,7 +118,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainContract.View, BottomNav
         homeFragment = HomeFragment.newInstance("home")
         addFragment(homeFragment)
         showFragment(homeFragment)
-        ImmersionBar.with(this).transparentStatusBar()?.fullScreen(true)?.statusBarDarkFont(false)?.init()
+        ImmersionBar.with(this).transparentStatusBar()?.fullScreen(false)?.statusBarDarkFont(false)?.init()
     }
 
     private fun showFragment(fragment: Fragment) {

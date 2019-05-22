@@ -110,8 +110,6 @@ constructor(model: HomeContract.Model, rootView: HomeContract.View) :
             })
     }
 
-
-
     override fun onDestroy() {
         super.onDestroy()
     }
