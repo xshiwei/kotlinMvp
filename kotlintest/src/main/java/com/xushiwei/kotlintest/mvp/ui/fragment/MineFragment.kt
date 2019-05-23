@@ -2,8 +2,6 @@ package com.xushiwei.kotlintest.mvp.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Message
-import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +27,6 @@ class MineFragment : BaseFragment<MinePresenter>(), MineContract.View {
             return fragment
         }
     }
-
 
     override fun setupFragmentComponent(appComponent: AppComponent) {
         DaggerMineComponent //如找不到该类,请编译一下项目

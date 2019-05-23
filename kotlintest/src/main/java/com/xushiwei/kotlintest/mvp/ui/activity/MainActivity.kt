@@ -98,7 +98,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainContract.View, BottomNav
         if (savedInstanceState != null) {
             homeFragment = supportFragmentManager.getFragment(savedInstanceState, HOME_FRAGMENT_KEY) as HomeFragment
             discoveryFragment =
-                    supportFragmentManager.getFragment(savedInstanceState, DISCOVERY_FRAGMENT_KEY) as DiscoveryFragment
+                supportFragmentManager.getFragment(savedInstanceState, DISCOVERY_FRAGMENT_KEY) as DiscoveryFragment
             hotFragment = supportFragmentManager.getFragment(savedInstanceState, HOT_FRAGMENT_KEY) as HotFragment
             mineFragment = supportFragmentManager.getFragment(savedInstanceState, MINE_FRAGMENT_KEY) as MineFragment
             addToList(homeFragment)
@@ -124,7 +124,7 @@ class MainActivity : BaseActivity<MainPresenter>(), MainContract.View, BottomNav
     private fun showFragment(fragment: Fragment) {
         fragments.forEach {
             if (it != fragment) {
-                supportFragmentManager.beginTransaction().hide(fragment).commit()
+                supportFragmentManager.beginTransaction().hide(it).commit()
             }
         }
         supportFragmentManager.beginTransaction().show(fragment).commit()
@@ -175,6 +175,12 @@ class MainActivity : BaseActivity<MainPresenter>(), MainContract.View, BottomNav
     }
 
     override fun onTabReselected(position: Int) {
+    }
+
+    override fun onTabUnselected(position: Int) {
+    }
+
+    override fun onTabSelected(position: Int) {
         when (position) {
             0 -> {
                 addFragment(homeFragment)
@@ -195,12 +201,6 @@ class MainActivity : BaseActivity<MainPresenter>(), MainContract.View, BottomNav
             else -> {
             }
         }
-    }
-
-    override fun onTabUnselected(position: Int) {
-    }
-
-    override fun onTabSelected(position: Int) {
     }
 
     private var firstTime: Long = 0

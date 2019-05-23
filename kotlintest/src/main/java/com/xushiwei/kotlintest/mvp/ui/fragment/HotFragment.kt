@@ -2,11 +2,11 @@ package com.xushiwei.kotlintest.mvp.ui.fragment
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Message
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.hazz.kotlinmvp.mvp.model.bean.TabInfoBean
 
 import com.jess.arms.base.BaseFragment
 import com.jess.arms.di.component.AppComponent
@@ -18,8 +18,17 @@ import com.xushiwei.kotlintest.mvp.contract.HotContract
 import com.xushiwei.kotlintest.mvp.presenter.HotPresenter
 
 import com.xushiwei.kotlintest.R
+import com.xushiwei.kotlintest.mvp.ui.adapter.MyTabLayoutAdapter
+import kotlinx.android.synthetic.main.fragment_hot.*
+import javax.inject.Inject
 
 class HotFragment : BaseFragment<HotPresenter>(), HotContract.View {
+
+    @Inject
+    lateinit var mFragments: ArrayList<Fragment>
+    @Inject
+    lateinit var mTitles: ArrayList<String>
+
     companion object {
         fun newInstance(param: String): HotFragment {
             val fragment = HotFragment()
@@ -29,7 +38,6 @@ class HotFragment : BaseFragment<HotPresenter>(), HotContract.View {
             return fragment
         }
     }
-
 
     override fun setupFragmentComponent(appComponent: AppComponent) {
         DaggerHotComponent //如找不到该类,请编译一下项目
@@ -70,5 +78,15 @@ class HotFragment : BaseFragment<HotPresenter>(), HotContract.View {
 
     override fun killMyself() {
 
+    }
+
+    override fun setTabInfo(tabInfoBean: TabInfoBean) {
+        tabInfoBean.tabInfo.tabList.mapTo(mTitles) { it.name }
+        tabInfoBean.tabInfo.tabList.mapTo(mFragments) { RankFragment.newInstance(it.apiUrl) }
+
+        mViewPager.adapter = MyTabLayoutAdapter(childFragmentManager, mFragments, mTitles)
+        mTabLayout.setupWithViewPager(mViewPager)
+        mViewPager.offscreenPageLimit = 3
+        mViewPager.currentItem = 0
     }
 }

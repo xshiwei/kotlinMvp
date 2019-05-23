@@ -14,19 +14,18 @@ import com.xushiwei.kotlintest.R
 import me.jessyan.rxerrorhandler.core.RxErrorHandler
 import javax.inject.Inject
 
-import com.xushiwei.kotlintest.mvp.contract.HomeContract
-import com.xushiwei.kotlintest.mvp.ui.adapter.HomeListAdapter
+import com.xushiwei.kotlintest.mvp.contract.FollowContract
+import com.xushiwei.kotlintest.mvp.ui.adapter.FollowAdapter
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_home.*
 import me.jessyan.rxerrorhandler.handler.ErrorHandleSubscriber
 import me.jessyan.rxerrorhandler.handler.RetryWithDelay
 
 @FragmentScope
-class HomePresenter
+class FollowPresenter
 @Inject
-constructor(model: HomeContract.Model, rootView: HomeContract.View) :
-    BasePresenter<HomeContract.Model, HomeContract.View>(model, rootView) {
+constructor(model: FollowContract.Model, rootView: FollowContract.View) :
+    BasePresenter<FollowContract.Model, FollowContract.View>(model, rootView) {
     @Inject
     lateinit var mErrorHandler: RxErrorHandler
     @Inject
@@ -36,20 +35,19 @@ constructor(model: HomeContract.Model, rootView: HomeContract.View) :
     @Inject
     lateinit var mAppManager: AppManager
 
-    @Inject
-    lateinit var mAdapter: HomeListAdapter
 
-    private var bannerHomeBean: HomeBean? = null
+    @Inject
+    lateinit var mAdapter: FollowAdapter
 
     private var nextPageUrl: String? = null
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onCreate() {
-        getHomeList(true, 1)
+        getFollowList(true)
     }
 
-     fun getHomeList(pullToRefresh: Boolean, num: Int) {
-         mModel.getHomeBean(num)
+    fun getFollowList(pullToRefresh: Boolean) {
+        mModel.requestFollowList()
             .subscribeOn(Schedulers.io())
             .retryWhen(RetryWithDelay(2, 2))
             .doOnSubscribe {
@@ -57,24 +55,14 @@ constructor(model: HomeContract.Model, rootView: HomeContract.View) :
                     mRootView.showLoading()
                 }
             }
-            .flatMap { homeBean ->
-                val bannerItemList = homeBean.issueList[0].itemList
-                bannerItemList.filter { item ->
-                    item.type == "banner2" || item.type == "horizontalScrollCard"
-                }.forEach { item ->
-                    bannerItemList.remove(item)
-                }
-                bannerHomeBean = homeBean
-                mModel.getmoreData(homeBean.nextPageUrl)
-            }
             .observeOn(AndroidSchedulers.mainThread())
             .compose(RxLifecycleUtils.bindToLifecycle(mRootView))
             .doFinally {
-                if (pullToRefresh){
+                if (pullToRefresh) {
                     mRootView.hideLoading()
                 }
             }
-            .subscribe(object : ErrorHandleSubscriber<HomeBean?>(mErrorHandler) {
+            .subscribe(object : ErrorHandleSubscriber<HomeBean.Issue?>(mErrorHandler) {
 
                 override fun onError(t: Throwable) {
                     super.onError(t)
@@ -87,24 +75,10 @@ constructor(model: HomeContract.Model, rootView: HomeContract.View) :
                     mAdapter.setEmptyView(R.layout.layout_error_view)
                 }
 
-                override fun onNext(t: HomeBean) {
+                override fun onNext(t: HomeBean.Issue) {
                     if (pullToRefresh) {
                         nextPageUrl = t.nextPageUrl
-                        //过滤掉 Banner2(包含广告,等不需要的 Type), 具体查看接口分析
-                        val newBannerItemList = t.issueList[0].itemList
-                        newBannerItemList.filter { item ->
-                            item.type == "banner2" || item.type == "horizontalScrollCard"
-                        }.forEach { item ->
-                            //移除 item
-                            newBannerItemList.remove(item)
-                        }
-                        // 重新赋值 Banner 长度
-                        bannerHomeBean!!.issueList[0].count = bannerHomeBean!!.issueList[0].itemList.size
-                        //赋值过滤后的数据 + banner 数据
-                        bannerHomeBean?.issueList!![0].itemList.addAll(newBannerItemList)
-
-                        mAdapter.setNewData(bannerHomeBean!!.issueList[0].itemList)
-                        mAdapter.setBannerSize(bannerHomeBean!!.issueList[0].count)
+                        mAdapter.setNewData(t.itemList)
                         mAdapter.setEnableLoadMore(true)
                         mRootView.hideLoading()
                         mAdapter.disableLoadMoreIfNotFullPage()
@@ -116,28 +90,21 @@ constructor(model: HomeContract.Model, rootView: HomeContract.View) :
     }
 
     private fun getMoreData() {
-        mModel.getmoreData(nextPageUrl!!)
+        mModel.loadMoreData(nextPageUrl!!)
             .subscribeOn(Schedulers.io())
             .retryWhen(RetryWithDelay(2, 2))
             .observeOn(AndroidSchedulers.mainThread())
             .compose(RxLifecycleUtils.bindToLifecycle(mRootView))
-            .subscribe(object : ErrorHandleSubscriber<HomeBean?>(mErrorHandler) {
+            .subscribe(object : ErrorHandleSubscriber<HomeBean.Issue?>(mErrorHandler) {
 
                 override fun onError(t: Throwable) {
                     super.onError(t)
                     mAdapter.loadMoreFail()
                 }
 
-                override fun onNext(homeBean: HomeBean) {
-                    val newItemList = homeBean.issueList[0].itemList
-                    newItemList.filter { item ->
-                        item.type == "banner2" || item.type == "horizontalScrollCard"
-                    }.forEach { item ->
-                        //移除 item
-                        newItemList.remove(item)
-                    }
-                    nextPageUrl = homeBean.nextPageUrl
-                    mAdapter.addData(newItemList)
+                override fun onNext(t: HomeBean.Issue) {
+                    nextPageUrl = t.nextPageUrl
+                    mAdapter.addData(t.itemList)
                     mAdapter.loadMoreComplete()
                 }
             })

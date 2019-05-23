@@ -5,17 +5,17 @@ import com.google.gson.Gson
 import com.jess.arms.integration.IRepositoryManager
 import com.jess.arms.mvp.BaseModel
 
-import com.jess.arms.di.scope.FragmentScope
+import com.jess.arms.di.scope.ActivityScope
 import javax.inject.Inject
 
-import com.xushiwei.kotlintest.mvp.contract.DiscoveryContract
+import com.xushiwei.kotlintest.mvp.contract.SplashContract
 
 
 /**
  * ================================================
  * Description:
  * <p>
- * Created by MVPArmsTemplate on 05/15/2019 14:27
+ * Created by MVPArmsTemplate on 05/23/2019 11:34
  * <a href="mailto:jess.yan.effort@gmail.com">Contact me</a>
  * <a href="https://github.com/JessYanCoding">Follow me</a>
  * <a href="https://github.com/JessYanCoding/MVPArms">Star me</a>
@@ -23,16 +23,16 @@ import com.xushiwei.kotlintest.mvp.contract.DiscoveryContract
  * <a href="https://github.com/JessYanCoding/MVPArmsTemplate">模版请保持更新</a>
  * ================================================
  */
-@FragmentScope
-class DiscoveryModel
+@ActivityScope
+class SplashModel
 @Inject
-constructor(repositoryManager: IRepositoryManager) : BaseModel(repositoryManager), DiscoveryContract.Model {
+constructor(repositoryManager: IRepositoryManager) : BaseModel(repositoryManager), SplashContract.Model {
     @Inject
     lateinit var mGson: Gson;
     @Inject
     lateinit var mApplication: Application;
 
     override fun onDestroy() {
-        super.onDestroy()
+        super.onDestroy();
     }
 }

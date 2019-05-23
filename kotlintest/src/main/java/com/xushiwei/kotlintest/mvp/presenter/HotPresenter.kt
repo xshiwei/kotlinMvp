@@ -1,29 +1,24 @@
 package com.xushiwei.kotlintest.mvp.presenter
 
 import android.app.Application
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.OnLifecycleEvent
+import com.hazz.kotlinmvp.mvp.model.bean.TabInfoBean
 
 import com.jess.arms.integration.AppManager
 import com.jess.arms.di.scope.FragmentScope
 import com.jess.arms.mvp.BasePresenter
 import com.jess.arms.http.imageloader.ImageLoader
+import com.jess.arms.utils.RxLifecycleUtils
 import me.jessyan.rxerrorhandler.core.RxErrorHandler
 import javax.inject.Inject
 
 import com.xushiwei.kotlintest.mvp.contract.HotContract
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import me.jessyan.rxerrorhandler.handler.ErrorHandleSubscriber
+import me.jessyan.rxerrorhandler.handler.RetryWithDelay
 
-
-/**
- * ================================================
- * Description:
- * <p>
- * Created by MVPArmsTemplate on 05/15/2019 14:29
- * <a href="mailto:jess.yan.effort@gmail.com">Contact me</a>
- * <a href="https://github.com/JessYanCoding">Follow me</a>
- * <a href="https://github.com/JessYanCoding/MVPArms">Star me</a>
- * <a href="https://github.com/JessYanCoding/MVPArms/wiki">See me</a>
- * <a href="https://github.com/JessYanCoding/MVPArmsTemplate">模版请保持更新</a>
- * ================================================
- */
 @FragmentScope
 class HotPresenter
 @Inject
@@ -38,8 +33,26 @@ constructor(model: HotContract.Model, rootView: HotContract.View) :
     @Inject
     lateinit var mAppManager: AppManager
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    fun onCreate() {
+        getTabInfo()
+    }
+
+    private fun getTabInfo() {
+        mModel.getTabInfoBean()
+            .subscribeOn(Schedulers.io())
+            .retryWhen(RetryWithDelay(2, 2))
+            .observeOn(AndroidSchedulers.mainThread())
+            .compose(RxLifecycleUtils.bindToLifecycle(mRootView))
+            .subscribe(object : ErrorHandleSubscriber<TabInfoBean?>(mErrorHandler) {
+                override fun onNext(t: TabInfoBean) {
+                    mRootView.setTabInfo(t)
+                }
+            })
+    }
+
 
     override fun onDestroy() {
-        super.onDestroy();
+        super.onDestroy()
     }
 }
