@@ -9,12 +9,13 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 import retrofit2.http.Url
 
-interface ApiService{
+interface ApiService {
+
     /**
      * 首页精选
      */
     @GET("v2/feed?")
-    fun getFirstHomeData(@Query("num") num:Int): Observable<HomeBean>
+    fun getFirstHomeData(@Query("num") num: Int): Observable<HomeBean>
 
     /**
      * 根据 nextPageUrl 请求数据下一页数据
@@ -56,7 +57,7 @@ interface ApiService{
      * 获取搜索信息
      */
     @GET("v1/search?&num=10&start=10")
-    fun getSearchData(@Query("query") query :String) : Observable<HomeBean.Issue>
+    fun getSearchData(@Query("query") query: String): Observable<HomeBean.Issue>
 
     /**
      * 热门搜索词
